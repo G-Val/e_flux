@@ -1,0 +1,14 @@
+{
+    "domain": "e_flux",
+    "name": "E-Flux",
+    "version": "0.1.0",
+    "documentation": "https://github.com/G-Val/e_flux",
+    "issue_tracker": "https://github.com/G-Val/e_flux/issues",
+    "dependencies": [],
+    "codeowners": ["@G-Val"],
+    "requirements": [
+      "aiohttp"
+    ],
+    "config_flow": true,
+    "iot_class": "cloud"
+  }
