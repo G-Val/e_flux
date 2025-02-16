@@ -28,13 +28,13 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
         return EFluxOptionsFlowHandler(config_entry)
-    
+
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         # Controleren of de integratie al geconfigureerd is
         if self._async_current_entries():
             return self.async_abort(reason="already_configured")
-        
+
         # OAuth stap beginnen
         return await self.async_step_oauth2(None)
 
@@ -42,10 +42,10 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_oauth2(self, user_input=None) -> FlowResult:
         """Handle the OAuth2 flow."""
 
-        # De OAuth implementatie ophalen (de ID van je OAuth2 applicatie in Home Assistant)
+        # De OAuth implementatie ophalen
         try:
             implementation = await config_entry_oauth2_flow.async_get_config_entry_implementation(
-                self.hass, "e_flux_oauth_app"  # <--- VERVANG DIT met de ID van je OAuth2 applicatie
+                self.hass, "application_credentials"  # <--- GECORRIGEERD
             )
         except Exception as e:
              _LOGGER.error("Failed to get oauth implementation: %s", e)
@@ -79,11 +79,11 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_create_entry(
             title="E-Flux Account",
             data={
-                "auth_implementation": "e_flux_oauth_app",  # <--- VERVANG DIT met de ID van je OAuth2 applicatie
+                "auth_implementation": "application_credentials",  # <--- GECORRIGEERD
                 "token": token,
             },
         )
-    
+
     async def async_step_reauth(self, user_input=None) -> FlowResult:
         """Perform reauth upon an API authentication error."""
         _LOGGER.debug("Reauthenticating")
