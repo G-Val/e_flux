@@ -5,6 +5,7 @@ import logging
 import voluptuous as vol
 import requests  # <--- Hier is de import
 import asyncio
+import json
 
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
@@ -53,16 +54,20 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def authenticate(self, username, password):  # of (self, api_token)
+    async def authenticate(self, username, password):
         """Authenticate with the E-Flux API and return the token."""
-        url = "https://api.e-flux.nl/1/auth/login"  # Correcte URL
+        url = "https://api.e-flux.nl/1/auth/login"
         try:
+            # Gebruik json.dumps om de data naar een JSON string om te zetten
+            payload = json.dumps({"email": username, "password": password})
+
             response = await self.hass.async_add_executor_job(
-                requests.post, url, json={"email": username, "password": password}
+                requests.post, url, payload,  # Gebruik 'payload' (als bytes) of 'data' (als string)
+                {'Content-Type': 'application/json'} # en geef expliciet de content-type door.
             )
-            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+            response.raise_for_status()
             data = response.json()
-            return response.json()["data"]["token"]
+            return data["data"]["token"]
 
         except requests.exceptions.RequestException as err:
             _LOGGER.error("Error communicating with E-Flux API: %s", err)
