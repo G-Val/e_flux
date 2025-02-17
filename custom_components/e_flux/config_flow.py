@@ -72,8 +72,7 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 requests.post,  # Functie
                 url,           # Positional argument 1: url
                 payload,       # Positional argument 2: data/payload (GEEN data=)
-                headers,       # Positional argument 3: headers (GEEN headers=)
-                10             # Positional argument 4: timeout (GEEN timeout=)
+                headers       # Positional argument 3: headers (GEEN headers=)
             )
             response.raise_for_status()
             data = response.json()
