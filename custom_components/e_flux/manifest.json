@@ -7,8 +7,9 @@
     "dependencies": [],
     "codeowners": ["@G-Val"],
     "requirements": [
-      "aiohttp"
+        "aiohttp",
+        "requests"
     ],
     "config_flow": true,
     "iot_class": "cloud"
-  }
+}
