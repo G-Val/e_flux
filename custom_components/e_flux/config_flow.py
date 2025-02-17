@@ -69,12 +69,14 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             payload = json.dumps({"email": username, "password": password})
 
             response = await self.hass.async_add_executor_job(
-                requests.post, url, payload, headers=headers # <--- Geef de headers mee!
+                requests.post, url, payload, headers, timeout=10
             )
             response.raise_for_status()
             data = response.json()
             return data["data"]["token"]
-
+        except requests.exceptions.Timeout as err: # <--- Specifieke Timeout error handling
+            _LOGGER.error("Timeout communicating with E-Flux API: %s", err)
+            return None
         except requests.exceptions.RequestException as err:
             _LOGGER.error("Error communicating with E-Flux API: %s", err)
             return None
