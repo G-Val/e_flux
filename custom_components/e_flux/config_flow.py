@@ -69,11 +69,11 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         try:
             response = await self.hass.async_add_executor_job(
-                requests.post,  # De functie zelf (als eerste argument)
-                url,           # url als positioneel argument
-                data=payload,    # data/payload als positioneel argument (let op: data=...)
-                headers=headers, # headers als positioneel argument (let op: headers=...)
-                timeout=10      # timeout als positioneel argument (let op: timeout=...)
+                requests.post,  # Functie
+                url,           # Positional argument 1: url
+                payload,       # Positional argument 2: data/payload (GEEN data=)
+                headers,       # Positional argument 3: headers (GEEN headers=)
+                10             # Positional argument 4: timeout (GEEN timeout=)
             )
             response.raise_for_status()
             data = response.json()
