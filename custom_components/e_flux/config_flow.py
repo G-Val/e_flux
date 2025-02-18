@@ -57,13 +57,13 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def authenticate(self, username, password):
         """Authenticate with the E-Flux API and return the token."""
         url = "https://api.e-flux.nl/1/auth/login"
-        headers = {  # <--- Voeg headers dictionary toe
+        headers = {  # Voeg headers dictionary toe
             "accept": "application/json",
             "content-type": "application/json",
             "origin": "https://dashboard.e-flux.io",
             "referer": "https://dashboard.e-flux.io/",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36", # Basic browser user-agent
-            "provider": "5e833daeadadc4003fdf7fb2", 
+            "provider": "5e833daeadadc4003fdf7fb2"
         }
         payload = json.dumps({"email": username, "password": password})
 
@@ -78,7 +78,7 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data = response.json()
             return data["data"]["token"]
     
-        except requests.exceptions.Timeout as err: # <--- Specifieke Timeout error handling
+        except requests.exceptions.Timeout as err: # Specifieke Timeout error handling
             _LOGGER.error("Timeout communicating with E-Flux API: %s", err)
             return None
         except requests.exceptions.RequestException as err:
