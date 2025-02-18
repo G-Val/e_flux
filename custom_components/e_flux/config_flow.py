@@ -1,6 +1,7 @@
 """Config flow for E-Flux integration."""
 
 import logging
+from pprint import pformat  # Voeg pformat toe
 
 import voluptuous as vol
 import requests  # <--- Hier is de import
@@ -54,50 +55,47 @@ class EFluxConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    # async def authenticate(self, username, password):
-    #     """Authenticate with the E-Flux API and return the token."""
-    #     url = "https://api.e-flux.nl/1/auth/login"
-    #     headers = {  # Voeg headers dictionary toe
-    #         "accept": "application/json",
-    #         "content-type": "application/json",
-    #         "origin": "https://dashboard.e-flux.io",
-    #         "referer": "https://dashboard.e-flux.io/",
-    #         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36", # Basic browser user-agent
-    #         "provider": "5e833daeadadc4003fdf7fb2"
-    #     }
-    #     payload = json.dumps({"email": username, "password": password})
-
-    #     try:
-    #         response = await self.hass.async_add_executor_job(
-    #             requests.post,  # Functie
-    #             url,           # Positional argument 1: url
-    #             payload,       # Positional argument 2: data/payload (GEEN data=)
-    #             headers       # Positional argument 3: headers (GEEN headers=)
-    #         )
-    #         response.raise_for_status()
-    #         data = response.json()
-    #         return data["data"]["token"]
-    
-    #     except requests.exceptions.Timeout as err: # Specifieke Timeout error handling
-    #         _LOGGER.error("Timeout communicating with E-Flux API: %s", err)
-    #         return None
-    #     except requests.exceptions.RequestException as err:
-    #         _LOGGER.error("Error communicating with E-Flux API: %s", err)
-    #         return None
-    #     except (KeyError, ValueError) as err:
-    #         _LOGGER.error("Invalid response from E-Flux API: %s", err)
-    #         return None
-
     async def authenticate(self, username, password):
-    url = "https://api.e-flux.nl/1/auth/login"
-    payload = json.dumps({"email": username, "password": password})
-    try:
-        response = await self.hass.async_add_executor_job(
-            requests.post, url, payload,  # MINIMAL: url, payload only
-        )
-        response.raise_for_status()
-        data = response.json()
-        return data["data"]["token"]
-    except Exception as err: # catch-all for now
-        _LOGGER.error(f"Simplified auth failed: {err}")
-        return None
+        """Authenticate with the E-Flux API and return the token."""
+        url = "https://api.e-flux.nl/1/auth/login"
+        headers = {  # Voeg headers dictionary toe
+            "accept": "application/json",
+            "content-type": "application/json",
+            "origin": "https://dashboard.e-flux.io",
+            "referer": "https://dashboard.e-flux.io/",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36", # Basic browser user-agent
+            "provider": "5e833daeadadc4003fdf7fb2"
+        }
+        payload = json.dumps({"email": username, "password": password})
+
+        # Log de request details
+        _LOGGER.debug("Sending request to E-Flux API: %s", url)
+        _LOGGER.debug("Request headers: %s", pformat(headers))
+        _LOGGER.debug("Request payload: %s", payload)
+
+        try:
+            response = await self.hass.async_add_executor_job(
+                requests.post,  # Functie
+                url,           # Positional argument 1: url
+                payload,       # Positional argument 2: data/payload (GEEN data=)
+                headers       # Positional argument 3: headers (GEEN headers=)
+            )
+
+            # Log de response details
+            _LOGGER.debug("Response status code: %s", response.status_code)
+            _LOGGER.debug("Response headers: %s", pformat(response.headers))
+            _LOGGER.debug("Response body: %s", response.text)
+
+            response.raise_for_status()
+            data = response.json()
+            return data["data"]["token"]
+    
+        except requests.exceptions.Timeout as err: # Specifieke Timeout error handling
+            _LOGGER.error("Timeout communicating with E-Flux API: %s", err)
+            return None
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Error communicating with E-Flux API: %s", err)
+            return None
+        except (KeyError, ValueError) as err:
+            _LOGGER.error("Invalid response from E-Flux API: %s", err)
+            return None
